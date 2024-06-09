@@ -1,0 +1,37 @@
+# The DSPK model associated with the paper 'Currents that modulate spike shape dynamics on 
+# multiple timescales induce ramping bursts in model respiratory neurons' by S. R. John, R. 
+# Phillips and J. E. Rubin
+
+% parameter values
+p gl=4,gnap=3.7666,gna=108.271,gk=250.148,gsyn=0.392166
+p ENa=55,EK=-73,EL=-62.5
+p vh=44.3497,sh=-1.92387,vh1=49.2889,sh1=4.5524,par1=1010,par2=5250
+p hna_vh=68,hna_sh=-11.9,thna_vh=67.5,thna_sh=-12.8
+p hnap_vh=60.8242,hnap_sh=-9.33381,thnap_vh=63.5594,thnap_sh=9.41933
+p mna_vh=43.8,mna_sh=6,tmna_vh=43.8,tmna_sh=14
+
+%currents and other functions
+INa=gna*(mNa^3)*hNa*hNa2*(V-ENa)
+INaP=gnap*mNaP*hNaP*(V-ENa)
+IK=gk*(n^4)*(V-EK)
+IL=gl*(V-EL)
+Isyn=gsyn*(V+10.0)
+k1=(0.011*(44.0+V))/(1-exp((-44.0-V)/5.0))
+k2=0.17*exp((-V-49.0)/40.0)
+tau_n=1/(k1+k2)
+n_inf=k1/(k1+k2)
+
+% ode equations
+V'=(-INa-INaP-IK-IL-Isyn)/36.0
+hNa'=((1/(1+exp(-(V+hna_vh)/(hna_sh))))-hNa)*((cosh((V+thna_vh)/(thna_sh)))/8.46)
+hNaP'=((1/(1+exp(-(V+hnap_vh)/(hnap_sh))))-hNaP)*((cosh((V+thnap_vh)/thnap_sh))/par2)
+mNa'=((1/(1+exp(-(V+mna_vh)/mna_sh)))-mNa)*((cosh((V+tmna_vh)/tmna_sh))/0.25)
+mNaP'=((1/(1+exp(-(V+47.1)/3.1)))-mNaP)*((cosh((V+47.1)/6.2))/1.0)
+n'=(n_inf-n)/(tau_n)
+hNa2'=((1/(1+exp(-(V+vh)/(sh))))-hNa2)*((cosh((V+vh1)/(sh1)))/par1)
+
+#Extra Settings
+@ total=30000,dt=0.1,bounds=100000,maxstor=1000000
+@ xlo=0,xhi=30000,ylo=-65,yhi=-10
+@ meth=cvode,tol=1e-6,atol=1e-6 
+                                                                                                                                                                                                                                                                                                          
